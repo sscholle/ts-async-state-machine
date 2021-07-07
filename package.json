@@ -1,10 +1,14 @@
 {
   "name": "ts-async-state-machine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "simple asynchonous finite state machine",
-  "keywords": [],
-  "author": "",
+  "keywords": ["state", "machine", "async"],
+  "author": "Sebastian Scholle",
   "license": "ISC",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/sscholle/ts-async-state-machine.git"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "jest": "^27.0.6",
