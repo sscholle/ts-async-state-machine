@@ -2,10 +2,16 @@
  * Simple Async State Machine
  */
 
-// Machine Interfaces
 export interface State {
     name: string,
     onEnter: (previousStateName: string) => Promise<State>,
+};
+
+export interface Transition {
+    from: string,
+    to: string,
+    /* 'condition' should be a small check before the State is activated - can be omitted */
+    condition: (prevState: State) => boolean
 };
 
 export enum States {
@@ -16,20 +22,14 @@ export enum States {
 export const InvalidState = {
     name: States.InvalidState.toString(),
     onEnter: (prevStateName: string): Promise<State> => new Promise((resolve, reject) => {
-            console.log('Invalid State', 'prev:', prevStateName)
             reject(InvalidState);
         })
-};
-
-export interface Transition {
-    from: string,
-    to: string,
-    condition: (prevState: State) => boolean // todo: find a use for using 'condition' (to/from should be condition enough, the rest is external...)
 };
 
 export function stateFactory(name: string, onEnter: (previousStateName: string) => Promise<any>): State {
     return {
         name,
+        /* since this callback must resolve `before` entering a State, this actullay needs to called 'onBeforeEnter' */
         onEnter
     };
 }
@@ -42,6 +42,9 @@ export function transitionFactory(from: string, to: string, condition: () => boo
     };
 }
 
+/**
+ * Main Machine Class - controls the flow of states
+ */
 export class Machine {
     states: State[];
     transitions: Transition[];
@@ -53,16 +56,19 @@ export class Machine {
         this.currentState = InvalidState as State;
     }
 
+    /**
+     * Returns current State
+     */
     get state(): State {
         return this.currentState;
     }
 
     /**
-     * starts the state machine
+     * starts the state machine - defaults to the first available state
      * @param forceStateName starrting state name
      * @returns State the state specified with forStateName or InvalidState
      */
-    start (forceStateName: string): State {
+    start (forceStateName: string = ''): State {
         const newState = forceStateName ? this.states.find(state => state.name === forceStateName) || InvalidState : this.states[0] || InvalidState;
         this.currentState = newState;
         return this.currentState;
@@ -80,16 +86,13 @@ export class Machine {
             newState = this.states.find(item => item.name === newStateName) || InvalidState;
         }
         return new Promise<State>((resolve, reject) => {
-            newState?.onEnter(this.currentState.name).then((result) => {
+            newState?.onEnter(this.currentState.name).then(() => {
                 this.currentState = newState;
                 resolve(newState);
-            }).catch(result => {
+            }).catch(() => {
                 this.currentState = InvalidState;
                 reject(InvalidState);
             });
-        }).catch(result => {
-            console.log('caught rejection: for safety -> throwing again', result)
-            throw result;
         });
     }
 };

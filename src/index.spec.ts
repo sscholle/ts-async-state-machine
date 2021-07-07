@@ -11,19 +11,18 @@ describe("microwave", () => {
         transitions.push(transitionFactory('running', 'on'));
         transitions.push(transitionFactory('on', 'off'));
         states.push(stateFactory('off', (prevState) => new Promise((resolve) => {
-                resolve(' this resolves ')
+                resolve('ok');
             })));
         onState = stateFactory('on', (prevState) => new Promise(resolve => {
-                console.log('successfully entered on state')
                 // ideally we only want to enter a state if this promise resolves
-                resolve('successfully entered on state')
+                resolve('ok');
             }));
         states.push(onState);
     })
 
     it("starts in off state", () => {
         const MicrowaveMachine = new Machine(states, transitions);
-        expect(MicrowaveMachine.start('off').name).toBe('off');
+        expect(MicrowaveMachine.start().name).toBe('off');
     })
 
     it("transitions to on state from off state", () => {
