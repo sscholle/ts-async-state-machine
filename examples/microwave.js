@@ -1,4 +1,4 @@
-const { Machine, stateFactory, transitionFactory } = require('ts-async-state-machine');
+const { Machine, stateFactory, transitionFactory } = require('../lib');
 
 // Declare states
 const states = [];

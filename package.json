@@ -20,7 +20,9 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "example": "npm run build && node ./examples/microwave.js"
   },
   "files": [
     "lib"

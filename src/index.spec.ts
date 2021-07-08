@@ -1,39 +1,47 @@
-import { InvalidState, Machine, State, stateFactory, Transition, transitionFactory } from "./index";
+import { Machine, State, stateFactory, Transition, transitionFactory } from "./index";
 
-describe("microwave", () => {
+describe("Microwave Sate Machine", () => {
     const states: State[] = [];
     const transitions: Transition[] = [];
+    let MicrowaveMachine: Machine;
+    let offState: State;
     let onState: State;
 
-    beforeEach(() => {
+    beforeAll(() => {
         transitions.push(transitionFactory('off', 'on'));
         transitions.push(transitionFactory('on', 'running'));
         transitions.push(transitionFactory('running', 'on'));
         transitions.push(transitionFactory('on', 'off'));
-        states.push(stateFactory('off', (prevState) => new Promise((resolve) => {
-                resolve('ok');
-            })));
+        offState = stateFactory('off', (prevState) => new Promise(resolve => {
+            resolve('ok');
+        }));
+        states.push(offState);
         onState = stateFactory('on', (prevState) => new Promise(resolve => {
-                // ideally we only want to enter a state if this promise resolves
                 resolve('ok');
             }));
         states.push(onState);
     })
 
-    it("starts in off state", () => {
-        const MicrowaveMachine = new Machine(states, transitions);
+    beforeEach(() => {
+        MicrowaveMachine = new Machine(states, transitions);
+    });
+
+    it("'start' returns first valid state - off", () => {
         expect(MicrowaveMachine.start().name).toBe('off');
-    })
+    });
 
-    it("transitions to on state from off state", () => {
-        const MicrowaveMachine = new Machine(states, transitions);
-        MicrowaveMachine.start('off');
-        expect(MicrowaveMachine.transition('on')).resolves.toBe(onState);
-    })
+    it("'state' returns current state - off", () => {
+        MicrowaveMachine.start();
+        expect(MicrowaveMachine.state.name).toBe('off');
+    });
 
-    it("invalid transition will result in InvalidState", () => {
-        const MicrowaveMachine = new Machine(states, transitions);
+    it("Transition to 'on' state from 'off' State", () => {
         MicrowaveMachine.start('off');
-        expect(MicrowaveMachine.transition('running')).rejects.toBe(InvalidState);
-    })
+        return expect(MicrowaveMachine.transition('on')).resolves.toEqual(onState);
+    });
+
+    it("Transition from 'off' to 'running' results in inital State", () => {
+        MicrowaveMachine.start(offState.name);
+        expect(MicrowaveMachine.transition('running')).rejects.toEqual(offState);
+    });
 })

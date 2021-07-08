@@ -1,5 +1,7 @@
 # Simple Async State Machine
 
+[![NPM](https://nodei.co/npm/ts-async-state-machine.png)](https://npmjs.org/package/ts-async-state-machine)
+
 ## Description
 
 the objective is to provide a simple interface to build a finite state machine
@@ -14,7 +16,7 @@ the objective is to provide a simple interface to build a finite state machine
 
  ## Example Usage
 
- ```javascript
+ ```typescript
 import { Machine, State, stateFactory, Transition, transitionFactory } from "ts-async-state-machine";
 
     // Declare states
@@ -49,9 +51,11 @@ import { Machine, State, stateFactory, Transition, transitionFactory } from "ts-
 
  ```
 
- ## More
-  * see `examples` folder for a full example in `microwave.js`
+## More
+ * see `/examples` folder for a full example in `microwave.js`
+ * run example: `npm run example`
 
 ## Development
+ * build: `npm run build`
  * test: `npm run test`
- * run example: `node ./examples/microwave.js`
+ * code coverage: `npm run test:coverage`
