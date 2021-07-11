@@ -6,6 +6,7 @@ describe("Microwave Sate Machine", () => {
     let MicrowaveMachine: Machine;
     let offState: State;
     let onState: State;
+    let runningState: State;
 
     beforeAll(() => {
         transitions.push(transitionFactory('off', 'on'));
@@ -42,6 +43,15 @@ describe("Microwave Sate Machine", () => {
 
     it("Transition from 'off' to 'running' results in inital State", () => {
         MicrowaveMachine.start(offState.name);
-        expect(MicrowaveMachine.transition('running')).rejects.toEqual(offState);
+        return expect(MicrowaveMachine.transition('running')).rejects.toEqual(offState);
+    });
+
+    it("Transition from 'on' to 'running' will reject when the state transition 'rejects'", () => {
+        runningState = stateFactory('running', (prevState) => new Promise((resolve, reject) => {
+            reject('make this state transisiton fail for some reason uing "reject"');
+        }));
+        states.push(runningState);
+        MicrowaveMachine.start('on');
+        return expect(MicrowaveMachine.transition('running')).rejects.toBeTruthy();
     });
 })

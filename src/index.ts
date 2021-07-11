@@ -22,19 +22,11 @@ export interface Transition {
 };
 
 /**
- * collection of internal States
- */
-enum States {
-    InvalidState,
-    UndefinedState
-};
-
-/**
  * Instance of an Invalid State, when initiated will always 'reject' a call for transistion
  * used internally
  */
 export const InvalidState = {
-    name: States.InvalidState.toString(),
+    name: "InvalidState",
     onBeforeEnter: (prevStateName: string): Promise<State> => new Promise((resolve, reject) => {
             reject(InvalidState);
         })
