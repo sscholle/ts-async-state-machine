@@ -1,6 +1,6 @@
 {
   "name": "ts-async-state-machine",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "simple asynchonous finite state machine",
   "keywords": ["state", "machine", "async"],
   "author": "Sebastian Scholle",
