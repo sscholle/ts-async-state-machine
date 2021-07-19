@@ -4,7 +4,7 @@
   "description": "simple asynchonous finite state machine",
   "keywords": ["state", "machine", "async"],
   "author": "Sebastian Scholle",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "repository": {
     "type" : "git",
     "url" : "https://github.com/sscholle/ts-async-state-machine.git"

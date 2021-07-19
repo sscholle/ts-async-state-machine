@@ -7,58 +7,63 @@
 the objective is to provide a simple interface to build a finite state machine
 
 ## Features
-* written in TypeScript and therefore includes a definitions file with full documentation (*.d.ts)
-* small package file: 2.8kb (compressed)
 * thoroughly tested with good code coverage
+* small package file: 3.2kb (compressed)
+* written in TypeScript and therefore includes a definitions file with full documentation (*.d.ts)
 
 ## Core Concepts
 
- * we define a set of `State`s, each with a `name` and `onBeforeEnter` callback
- * we define a set of `Transition`s, each of which define a pair or state names and an optional `condition` callback
- * we call `.transition('newStateName')` to trigger a state change to the specified state
- * we use `Promises` inside the `onBeforeEnter` to resolve/reject the state change
- * we get a `Promise` from calling `transition` allowing us to chain on `then`,`catch`,`finally`,etc...
+ * Define a set of `State`s, each with a `name`, a list of `fromStates` and some optional callbacks
+ * Call `.transition('newStateName')` to trigger a state change to the specified state
+ * Use `Promises` inside the `onBeforeEnter` callback to resolve/reject the state change (usually via server API)
 
  ## Example Usage
 
- ```ts
-import { Machine, State, stateFactory, Transition, transitionFactory } from "ts-async-state-machine";
+ ```javascript
+import { Machine } from "ts-async-state-machine";
 
-    // Declare states
-    const states: State[] = [];
-    states.push(stateFactory('off', (prevState) => new Promise((resolve) => {
-        // always call 'resolve' after your asynchronours process completes sucessfully
-        resolve('ok');
-    })));
-    states.push(stateFactory('on', (prevState) => new Promise(resolve => {
-        // add code here that runs asynchronously (example server request)
-        resolve('ok');
-        // otherwise call 'reject()'
-    })));
-    // add more states and state callbacks...
+// Create your Machine
+const MicrowaveMachine = new Machine('Microwave');
 
-    // Declare your transitions
-    const transitions: Transition[] = [];
-    transitions.push(transitionFactory('off', 'on'));
-    transitions.push(transitionFactory('on', 'running'));
-    transitions.push(transitionFactory('running', 'off'));
+// Add States to the Machine
+MicrowaveMachine.addState('off', ['running'], {
+    onBeforeEnter: (prevState) => new Promise((resolve, rejection) => {
+        // use a server APi request to 'confirm' the state change
+        resolve();// resolves the state transition - changes 'MicrowaveMachine's state to 'off'
+        // a 'rejection' will fail the internal state transition
+    })
+});
+MicrowaveMachine.addState('on', ['off'], {
+    // callbacks are optional and use them as needed: 'onEnter', 'onExit', 'onBeforeEnter' as options
+    onExit: () => {
+        console.log('Exited ON state')
+    }
+});
+MicrowaveMachine.addState('running', ['on'], {
+    onEnter: () => {
+        console.log('Entered RUNNING State')
+    }
+});
 
-    // Create your Machine
-    const MicrowaveMachine = new Machine(states, transitions);
+// Initialise into your required starting state
+MicrowaveMachine.start('off');
 
-    // Initialise into your required starting state
-    MicrowaveMachine.start('off');
+// Start Triggering State changes when neccessary
+MicrowaveMachine.transition('on').then(newState => {
+    console.log('Entered State', newState.name)
+}); // omitted 'catch' for brevity
 
-    // Call your transitions when you neeed to
-    MicrowaveMachine.transition('on').then(newState => {
-        // do whatever you need to here AFTER the state transitioned
-    });
+MicrowaveMachine.transition('running').then(newState => {
+    console.log('Entered State', newState.name)
+});
 
  ```
 
-## More
- * see `/examples` folder for a full example in `microwave.js`
- * run example: `npm run example`
+## Examples
+ * see `/examples` folder for a full examples in `microwave.js`, `traffic-light.js` and `traffic-light-server-stateful.js`
+ * run microwave example: `npm run example`
+ * other examples: `npm run build && node ./examples/traffic-light.js`
+ * other examples: `npm run build && node ./examples/traffic-light-server-stateful.js`
 
 ## Development
  * build: `npm run build`
